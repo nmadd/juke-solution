@@ -17,6 +17,7 @@ app.controller('AlbumCtrl', function($scope, $http, $q, $rootScope, StatsFactory
   }).catch(console.error.bind(console));
 
   // main toggle
+  //$scope.toggle = PlayerFactory.startToggle();
   $scope.toggle = function (song) {
     if (PlayerFactory.playing) $rootScope.$broadcast('pause');
     else $rootScope.$broadcast('play', song);
