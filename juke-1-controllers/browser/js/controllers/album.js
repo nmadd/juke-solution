@@ -1,8 +1,9 @@
-app.controller('AlbumCtrl', function($scope, $http, $rootScope) {
+app.controller('AlbumCtrl', function($scope, $http, $q, $rootScope, StatsFactory) {
+  var Stats = StatsFactory;
 
   // load our initial data
   $http.get('/api/albums/')
-  .then(res => $http.get('/api/albums/' + res.data[1]._id))
+  .then(res => $http.get('/api/albums/' + res.data[2]._id))
   .then(res => res.data)
   .then(album => {
     album.imageUrl = '/api/albums/' + album._id + '.image';
@@ -10,6 +11,10 @@ app.controller('AlbumCtrl', function($scope, $http, $rootScope) {
       song.audioUrl = '/api/songs/' + song._id + '.audio';
     });
     $scope.album = album;
+    StatsFactory.totalTime(album)
+    .then(function(response){
+      console.log(response)
+    })
   }).catch(console.error.bind(console));
 
   // main toggle
