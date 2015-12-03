@@ -1,5 +1,4 @@
-app.controller('AlbumCtrl', function($scope, $http, $q, $rootScope, StatsFactory) {
-  var Stats = StatsFactory;
+app.controller('AlbumCtrl', function($scope, $http, $q, $rootScope, StatsFactory, PlayerFactory) {
 
   // load our initial data
   $http.get('/api/albums/')
@@ -13,38 +12,29 @@ app.controller('AlbumCtrl', function($scope, $http, $q, $rootScope, StatsFactory
     $scope.album = album;
     StatsFactory.totalTime(album)
     .then(function(response){
-      console.log(response)
+      $scope.fullDuration = Math.floor(response/60);
     })
   }).catch(console.error.bind(console));
 
   // main toggle
   $scope.toggle = function (song) {
-    if ($scope.playing) $rootScope.$broadcast('pause');
+    if (PlayerFactory.playing) $rootScope.$broadcast('pause');
     else $rootScope.$broadcast('play', song);
   }
 
   // incoming events (from Player, toggle, or skip)
-  $scope.$on('pause', pause);
-  $scope.$on('play', play);
+  $scope.$on('pause', PlayerFactory.pause);
+  $scope.$on('play', PlayerFactory.play);
   $scope.$on('next', next);
   $scope.$on('prev', prev);
-
-  // functionality
-  function pause () {
-    $scope.playing = false;
-  }
-  function play (event, song){
-    $scope.playing = true;
-    $scope.currentSong = song;
-  };
 
   // a "true" modulo that wraps negative to the top of the range
   function mod (num, m) { return ((num%m)+m)%m; };
 
   // jump `val` spots in album (negative to go back)
   function skip (val) {
-    if (!$scope.currentSong) return;
-    var idx = $scope.album.songs.indexOf($scope.currentSong);
+    if (!PlayerFactory.currentSong) return;
+    var idx = $scope.album.songs.indexOf(PlayerFactory.currentSong);
     idx = mod( (idx + (val || 1)), $scope.album.songs.length );
     $rootScope.$broadcast('play', $scope.album.songs[idx]);
   };

@@ -1,12 +1,12 @@
-app.controller('PlayerCtrl', function($scope, $rootScope){
+app.controller('PlayerCtrl', function($scope, $rootScope, PlayerFactory){
 
   // initialize audio player
-  var audio = document.createElement('audio');
-  audio.addEventListener('ended', function () {
+  // var audio = document.createElement('audio');
+  PlayerFactory.audio.addEventListener('ended', function () {
     $scope.next();
   });
-  audio.addEventListener('timeupdate', function () {
-    $scope.progress = 100 * audio.currentTime / audio.duration;
+  PlayerFactory.audio.addEventListener('timeupdate', function () {
+    $scope.progress = 100 * PlayerFactory.audio.currentTime / PlayerFactory.audio.duration;
     $scope.$digest();
   });
 
@@ -21,14 +21,15 @@ app.controller('PlayerCtrl', function($scope, $rootScope){
   }
 
   // incoming events (from Album or toggle)
-  $scope.$on('pause', pause);
-  $scope.$on('play', play);
+  $scope.$on('pause', PlayerFactory.pause);
+  $scope.$on('play', PlayerFactory.play);
 
   // functionality
-  function pause () {
-    audio.pause();
-    $scope.playing = false;
-  }
+  // function pause () {
+  //   audio.pause();
+  //   $scope.playing = false;
+  // }
+
   function play (event, song){
     // stop existing audio (e.g. other song) in any case
     pause();
