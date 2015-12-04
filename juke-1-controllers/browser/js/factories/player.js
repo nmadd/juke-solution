@@ -1,11 +1,17 @@
-app.factory('PlayerFactory', function ($q) {
+app.factory('PlayerFactory', function ($q, AlbumFactory) {
+    var tempAlbum;
+
+    AlbumFactory.fetchAll()
+    .then(function(album) {
+        tempAlbum = album.data;
+    });
+
     var playerObj = {};
 
     // state variables
     playerObj.currentSong;
     playerObj.playing = false;
     playerObj.audio = document.createElement('audio');
-
     
     // functionality
     playerObj.pause = function () {
@@ -25,46 +31,41 @@ app.factory('PlayerFactory', function ($q) {
       playerObj.audio.play();
     };
 
-    playerObj.resume = function (song) {
-        if (playerObj.playing){
+    playerObj.resume = function(song) {
+        if (playerObj.playing && song === playerObj.currentSong){
           playerObj.pause();
-          playerObj.playing = false;
         }
         else{
           playerObj.start(song);
-          playerObj.playing = true;
         }
+    }
 
-     }
+    var count = 0;
+    var thisCount = 0;
 
     playerObj.isPlaying = function(){
-      return playerObj.playing;
-    }
-    playerObj.getPlaying = function(){
+      thisCount++;
       return playerObj.playing;
     }
 
-     playerObj.getCurrentSong = function(){
+    playerObj.getCurrentSong = function(){
+      count++;
       if(!playerObj.currentSong) return null;
       return playerObj.currentSong;
     }
-
-    playerObj.startToggle = function(song){
-      return playerObj.toggle(song);
-    }
     
-  //  playerObj.mod = function(num, m) { return ((num%m)+m)%m; };
+    playerObj.mod = function(num, m) { return ((num%m)+m)%m; };
 
-  // // jump `val` spots in album (negative to go back)
-  //  playerObj.skip = function(val) {
-  //   if (!playerObj.currentSong) return;
-  //   var idx = $scope.album.songs.indexOf(PlayerFactory.currentSong);
-  //   idx = mod( (idx + (val || 1)), $scope.album.songs.length );
-  //   $rootScope.$broadcast('play', $scope.album.songs[idx]);
-  //  };
+    // jump `val` spots in album (negative to go back)
+    playerObj.skip = function(val) {
+        if (!playerObj.currentSong) return;
+        var idx = tempAlbum.songs.indexOf(playerObj.currentSong) + 1;
+        idx = playerObj.mod( (idx + (val || 1)), tempAlbum.songs.length );
+        playerObj.start(tempAlbum.songs[idx]);
+    };
 
-  // playerObj.next =function() { skip(1); };
-  // playerObj.prev =function() { skip(-1); };
-  
-  return playerObj;
+    playerObj.next = function() { playerObj.skip(1); };
+    playerObj.prev = function() { playerObj.skip(-1); };
+
+    return playerObj;
 });

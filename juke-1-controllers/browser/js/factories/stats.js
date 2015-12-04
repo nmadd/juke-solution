@@ -6,8 +6,8 @@ app.factory('StatsFactory', function ($q) {
             var sum = 0;
             var n = 0;
             function resolveOrRecur () {
-                if (n >= album.songs.length) resolve(sum);
-                else audio.src = album.songs[n++].audioUrl;
+                if (n >= album.data.songs.length) resolve(sum);
+                else audio.src = album.data.songs[n++].audioUrl;
             }
             audio.addEventListener('loadedmetadata', function () {
                 sum += audio.duration;
